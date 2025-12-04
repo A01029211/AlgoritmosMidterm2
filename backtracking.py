@@ -1,4 +1,12 @@
 from Knapsack import area_salon, knapsack
+import copy
+from multiprocessing import Pool, cpu_count
+
+def worker_task(args):
+    classroom, table_sizes, next_index = args
+    best_result = [0, None]
+    backtrack(classroom, table_sizes, next_index, best_result)
+    return best_result
 
 def generate_zero_matrix(height, width):
     return [[0 for _ in range(width)] for _ in range(height)]
@@ -100,6 +108,29 @@ def backtrack(classroom, table_sizes, table_index, best_result):
     if not placed:
         return
 
+def parallel_backtrack(classroom, table_sizes):
+    height_t, width_t = table_sizes[0]
+
+    tasks = []
+
+    # Generate all valid placements for the FIRST table only
+    for row in range(1, len(classroom)-1):
+        for col in range(1, len(classroom[0])-1):
+            if can_place(classroom, row, col, height_t, width_t):
+
+                new_matrix = copy.deepcopy(classroom)
+                place(new_matrix, row, col, height_t, width_t, 1)
+
+                # Each task gets its own matrix + continues from index 1
+                tasks.append((new_matrix, table_sizes, 1))
+
+    # Run workers in parallel
+    with Pool(processes=cpu_count()) as pool:
+        results = pool.map(worker_task, tasks)
+
+    # Pick the best result across all processes
+    best = max(results, key=lambda r: r[0])
+    return best
 
 
 
@@ -195,7 +226,14 @@ if __name__ == "__main__":
     classroom = generate_zero_matrix(class_h, class_w)
     best_result = [0, None]  # [mejor_celdas_ocupadas, mejor_matriz]
 
-    backtrack(classroom, table_sizes, 0, best_result)
+    #backtrack(classroom, table_sizes, 0, best_result)
+
+    if len(table_sizes) > 0:
+        best_value, best_matrix = parallel_backtrack(classroom, table_sizes)
+    else:
+        best_value, best_matrix = 0, classroom
+
+    best_result = [best_value, best_matrix]
 
     best_value = best_result[0]
     best_matrix = best_result[1]
