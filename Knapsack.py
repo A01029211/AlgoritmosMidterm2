@@ -33,7 +33,7 @@ def knapsack(area_salon, valores, areas):
     max_valores, seleccion = knapsackRec(area_salon, valores, areas, n)
     return max_valores, seleccion
 
-
+"""
 if __name__ =="__main__":
     largo_salon = 15
     ancho_salon=50
@@ -66,6 +66,6 @@ if __name__ =="__main__":
     for i in range(len(estudiantes_por_mesa)):
         print("  Tipo", i, "- mesas:", conteo_tipos[i], "- asientos por mesa:", estudiantes_por_mesa[i], "- area:", areas[i])
  
-
+"""
     
 
