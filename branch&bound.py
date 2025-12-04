@@ -4,7 +4,6 @@ class BranchAndBoundMaxSum:
     def __init__(self, values: List[int]):
         self.values = values      # valores de cada elemento
         self.n = len(values)
-
         self.best_value = 0       # mejor suma encontrada
         self.best_choice = [0] * self.n  # solución óptima (0/1)
 
@@ -56,7 +55,7 @@ class BranchAndBoundMaxSum:
 
 # Función que imprime la distribución
 def imprimir_distribucion(values: List[int], best_choice: List[int]):
-    print("=== Solución Branch & Bound (versión simple) ===")
+    print("=== Solución Branch & Bound ===")
     total_valor = 0
 
     for i, elegido in enumerate(best_choice):
@@ -68,17 +67,4 @@ def imprimir_distribucion(values: List[int], best_choice: List[int]):
     print(f"Suma total de valores: {total_valor}")
 
 
-# Main 
-if __name__ == "__main__":
-    valores = [3, 5, 2, 8]
-    
-    solver = BranchAndBoundMaxSum(valores)
-    best_value, best_choice = solver.solve()
 
-    print("Valores:", valores)
-    print("Mejor suma:", best_value)
-    print("Vector solución (0/1):", best_choice)
-    print()
-
-    # Nueva forma de mostrar la solución
-    imprimir_distribucion(valores, best_choice)
