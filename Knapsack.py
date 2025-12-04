@@ -1,37 +1,43 @@
-#funcion para definir el area del salon
+from functools import lru_cache
+
+# Función para definir el área del salón
 def area_salon(largo, ancho):
     return largo * ancho
 
-#knapsck modificado para seleccionar mesas por area
 def knapsackRec(W, values, weights, n):
-    # caso base
-    if W <= 0 or n == 0:
-        return 0, []
+    # Use a wrapper that supports memoization
+    return _knapsackRec(W, n, tuple(values), tuple(weights))
 
-    # 1) opcion: NO tomar la mesa de indice n-1
-    val_not, list_not = knapsackRec(W, values, weights, n - 1)
+@lru_cache(None)
+def _knapsackRec(W, n, values, weights):
+    # Caso base
+    if W <= 0 or n == 0:
+        return 0, ()
+
+    # NO tomar la mesa
+    val_not, list_not = _knapsackRec(W, n - 1, values, weights)
     best_val = val_not
     best_list = list_not
 
-    # 2) opcion: SI tomar la mesa de indice n-1 (si cabe)
+    # SI tomar la mesa (si cabe)
     if weights[n - 1] <= W:
-        val_with, list_with = knapsackRec(W - weights[n - 1], values, weights, n)
-        # sumamos el valor de esta mesa
-        val_with = val_with + values[n - 1]
-        # agregamos la mesa a la lista
-        list_with = list_with + [n - 1]
+        val_with, list_with = _knapsackRec(W - weights[n - 1], n, values, weights)
+        val_with += values[n - 1]
+        list_with = list_with + (n - 1,)
 
-        # nos quedamos con la mejor opcion
         if val_with > best_val:
             best_val = val_with
             best_list = list_with
 
     return best_val, best_list
 
-def knapsack(area_salon, valores, areas):
+
+def knapsack(area, valores, areas):
+    valores_t = tuple(valores)
+    areas_t = tuple(areas)
     n = len(valores)
-    max_valores, seleccion = knapsackRec(area_salon, valores, areas, n)
-    return max_valores, seleccion
+    best, chosen_tuple = knapsackRec(area, valores_t, areas_t, n)
+    return best, list(chosen_tuple)
 
 """
 if __name__ =="__main__":
